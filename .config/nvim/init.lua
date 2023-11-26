@@ -26,6 +26,9 @@ require("lazy").setup({
 	{
 		"nvim-lualine/lualine.nvim",
 	},
+	{
+		"lewis6991/gitsigns.nvim",
+	},
 })
 
 require("catppuccin").setup {
