@@ -31,6 +31,13 @@ require("lazy").setup({
 	},
 	{
 		"tpope/vim-sleuth",
+	},
+	{
+		"nvim-treesitter/nvim-treesitter",
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter-textobjects",
+		},
+		build = ":TSUpdate",
 	}
 })
 
@@ -51,9 +58,10 @@ require("lualine").setup {
 require("gitsigns").setup {}
 
 vim.cmd.colorscheme "catppuccin"
-vim.opt.nu = true
-vim.opt.cc = "80"
-vim.opt.cul = true
+vim.wo.number = true
+vim.opt.mouse = "a"
+vim.opt.colorcolumn = "80"
+vim.opt.cursorline = true
 vim.opt.list = true
 vim.opt.listchars = "tab:→ ,trail:·,extends:>,precedes:<,space:·"
 
