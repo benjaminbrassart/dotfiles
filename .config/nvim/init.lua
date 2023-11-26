@@ -23,11 +23,23 @@ require("lazy").setup({
 		"catppuccin/nvim",
 		name = "catppuccin",
 	},
+	{
+		"nvim-lualine/lualine.nvim",
+	},
 })
 
 require("catppuccin").setup {
 	flavour = "mocha",
 	transparent_background = true,
+}
+
+require("lualine").setup {
+	options = {
+		theme = "catppuccin",
+		icons_enabled = true,
+		section_separators = "",
+		component_separators = "|",
+	},
 }
 
 vim.cmd.colorscheme "catppuccin"
