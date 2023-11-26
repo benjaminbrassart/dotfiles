@@ -43,3 +43,6 @@ require("lualine").setup {
 }
 
 vim.cmd.colorscheme "catppuccin"
+vim.opt.nu = true
+vim.opt.cc = "80"
+vim.opt.cul = true
