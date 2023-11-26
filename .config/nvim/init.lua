@@ -22,9 +22,18 @@ require("lazy").setup({
 	{
 		"catppuccin/nvim",
 		name = "catppuccin",
+		opts = {
+			flavour = "mocha",
+			transparent_background = true,
+		},
 	},
 	{
 		"nvim-lualine/lualine.nvim",
+		opts = {
+			theme = "catppuccin",
+			section_separators = "",
+			component_separators = "|",
+		},
 	},
 	{
 		"lewis6991/gitsigns.nvim",
@@ -38,32 +47,23 @@ require("lazy").setup({
 			"nvim-treesitter/nvim-treesitter-textobjects",
 		},
 		build = ":TSUpdate",
-	}
-})
-
-require("catppuccin").setup {
-	flavour = "mocha",
-	transparent_background = true,
-}
-
-require("lualine").setup {
-	options = {
-		theme = "catppuccin",
-		icons_enabled = true,
-		section_separators = "",
-		component_separators = "|",
 	},
-}
-
-require("gitsigns").setup {}
+	{
+		"rcarriga/nvim-notify",
+	},
+})
 
 vim.cmd.colorscheme "catppuccin"
 vim.wo.number = true
+vim.opt.termguicolors = true
 vim.opt.mouse = "a"
 vim.opt.colorcolumn = "80"
 vim.opt.cursorline = true
 vim.opt.list = true
 vim.opt.listchars = "tab:→ ,trail:·,extends:>,precedes:<,space:·"
+
+vim.notify = require("notify")
+require("gitsigns").setup {}
 
 local augroup = vim.api.nvim_create_augroup("benjaminbrassart/dotfiles", {
 	clear = true,
