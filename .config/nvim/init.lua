@@ -30,9 +30,11 @@ require("lazy").setup({
 	{
 		"nvim-lualine/lualine.nvim",
 		opts = {
-			theme = "catppuccin",
-			section_separators = "",
-			component_separators = "|",
+			options = {
+				theme = "catppuccin",
+				section_separators = "",
+				component_separators = "|",
+			},
 		},
 	},
 	{
@@ -51,6 +53,12 @@ require("lazy").setup({
 	{
 		"rcarriga/nvim-notify",
 	},
+	{
+		"benjaminbrassart/42header",
+		opts = {
+			user = "bbrassar",
+		},
+	},
 })
 
 vim.cmd.colorscheme "catppuccin"
@@ -64,6 +72,8 @@ vim.opt.listchars = "tab:→ ,trail:·,extends:>,precedes:<,space:·"
 
 vim.notify = require("notify")
 require("gitsigns").setup {}
+
+vim.api.nvim_set_keymap("n", "<F2>", ":Stdheader<CR>", { noremap = true })
 
 local augroup = vim.api.nvim_create_augroup("benjaminbrassart/dotfiles", {
 	clear = true,
