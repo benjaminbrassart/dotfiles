@@ -29,6 +29,9 @@ require("lazy").setup({
 	{
 		"lewis6991/gitsigns.nvim",
 	},
+	{
+		"tpope/vim-sleuth",
+	}
 })
 
 require("catppuccin").setup {
@@ -45,7 +48,24 @@ require("lualine").setup {
 	},
 }
 
+require("gitsigns").setup {}
+
 vim.cmd.colorscheme "catppuccin"
 vim.opt.nu = true
 vim.opt.cc = "80"
 vim.opt.cul = true
+vim.opt.list = true
+vim.opt.listchars = "tab:→ ,trail:·,extends:>,precedes:<,space:·"
+
+local augroup = vim.api.nvim_create_augroup("benjaminbrassart/dotfiles", {
+	clear = true,
+})
+
+local function trim_whitespaces()
+	vim.cmd("%s/\\s\\+$//e")
+end
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+	group = augroup,
+	callback = trim_whitespaces,
+})
