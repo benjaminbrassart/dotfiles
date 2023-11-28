@@ -59,6 +59,18 @@ require("lazy").setup({
 			user = "bbrassar",
 		},
 	},
+	{
+		"iamcco/markdown-preview.nvim",
+		cmd = {
+			"MarkdownPreviewToggle",
+			"MarkdownPreview",
+			"MarkdownPreviewStop",
+		},
+		ft = { "markdown" },
+		build = function()
+			vim.fn["mkdp#util#install"]()
+		end,
+	}
 })
 
 vim.cmd.colorscheme "catppuccin"
@@ -83,7 +95,17 @@ local function trim_whitespaces()
 	vim.cmd("%s/\\s\\+$//e")
 end
 
-vim.api.nvim_create_autocmd("BufWritePre", {
+vim.api.nvim_create_autocmd({"BufWritePre"}, {
 	group = augroup,
 	callback = trim_whitespaces,
+})
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+	group = augroup,
+	pattern = { "*/libft/*.c", "*/libft/*.h" },
+	callback = function()
+		vim.opt_local.tabstop = 4
+		vim.opt_local.softtabstop = 4
+		vim.opt_local.shiftwidth = 4
+	end,
 })
