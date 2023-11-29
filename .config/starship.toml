@@ -55,7 +55,7 @@ add_newline = false
 ## FIRST LINE/ROW: Info & Status
 # First param ─┌
 [username]
-format = " [╭─$user]($style)@"
+format = " [╭─ $user]($style)@"
 style_user = "bold red"
 style_root = "bold red"
 show_always = true
@@ -127,8 +127,8 @@ error_symbol = " [╰─×](bold red)"
 
 # SYMBOLS
 [status]
-format = '[\[$common_meaning$signal_name$maybe_int\]]($style)'
-pipestatus_format = '\[$pipestatus\] => [$common_meaning$signal_name$maybe_int]($style)'
+format = '[\[$common_meaning$signal_name$maybe_int\]]($style) '
+pipestatus_format = '\[$pipestatus\] => [$common_meaning$signal_name$maybe_int]($style) '
 map_symbol = false
 disabled = false
 pipestatus = false
