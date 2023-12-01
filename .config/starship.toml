@@ -227,7 +227,7 @@ symbol = " "
 [shlvl]
 symbol = " "
 format = '[$symbol$shlvl]($style) '
-disabled = false
+disabled = true
 
 [swift]
 symbol = "ﯣ "
