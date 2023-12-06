@@ -2,7 +2,7 @@ set -x XDG_CONFIG_HOME ~/.config
 
 functions -e fish_greeting
 
-fish_add_path -a ~/.{yarn,cargo,locl}/bin
+fish_add_path -a ~/.{yarn,cargo,local}/bin
 
 alias l 'eza --git-ignore --git --header --group --icons=auto'
 alias editor vim
