@@ -110,19 +110,11 @@ vim.opt.colorcolumn = "80"
 vim.opt.cursorline = true
 vim.opt.list = true
 vim.opt.listchars = "tab:→ ,trail:·,extends:>,precedes:<,space:·"
+vim.opt.completeopt = "menu,menuone,noinsert"
 
 vim.notify = require("notify")
 
 local lsps = {
-	lua_ls = {
-		settings = {
-			Lua = {
-				diagnostics = {
-					globals = { "vim" },
-				},
-			},
-		},
-	},
 	clangd = {},
 	gopls = {},
 	rust_analyzer = {},
@@ -138,6 +130,34 @@ require("mason-lspconfig").setup {
 for lsp, config in pairs(lsps) do
 	require("lspconfig")[lsp].setup(config)
 end
+
+require("lspconfig").lua_ls.setup({
+	on_init = function(client)
+		local path = client.workspace_folders[1].name
+
+		if not vim.loop.fs_stat(path .. "/.luarc.json") then
+			client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
+				Lua = {
+					runtime = {
+						version = "LuaJIT",
+					},
+					workspace = {
+						checkThirdParty = false,
+						library = {
+							vim.env.VIMRUNTIME,
+						},
+					},
+				},
+			})
+
+			client.notify("workspace/didChangeConfiguration", {
+				settings = client.config.settings,
+			})
+		end
+
+		return true
+	end,
+})
 
 vim.api.nvim_set_keymap("n", "<F2>", ":Stdheader<CR>", { noremap = true })
 
