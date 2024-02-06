@@ -20,7 +20,7 @@ vim.opt.rtp:prepend(lazypath)
 
 vim.opt.termguicolors = true
 
-require("lazy").setup {
+require("lazy").setup({
 	{
 		"catppuccin/nvim",
 		name = "catppuccin",
@@ -53,6 +53,7 @@ require("lazy").setup {
 		"nvim-treesitter/nvim-treesitter",
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter-textobjects",
+			"MDeiml/tree-sitter-markdown",
 		},
 		build = ":TSUpdate",
 	},
@@ -85,6 +86,17 @@ require("lazy").setup {
 	},
 	{
 		"nvim-telescope/telescope.nvim",
+		opts = {
+			defaults = {
+				mappings = {
+					i = {
+						["<C-d>"] = function(...)
+							require("telescope.actions").delete_buffer(...)
+						end,
+					},
+				},
+			},
+		},
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope-fzf-native.nvim",
@@ -101,16 +113,38 @@ require("lazy").setup {
 		"folke/which-key.nvim",
 		opts = {},
 	},
-}
+	{
+		"stevearc/dressing.nvim",
+		opts = {
+			select = {
+				backend = {
+					"telescope",
+					"fzf_lua",
+					"fzf",
+					"builtin",
+				},
+			},
+		},
+	},
+	{
+		"rcarriga/nvim-dap-ui",
+		opts = {},
+		dependencies = {
+			"mfussenegger/nvim-dap",
+		},
+	},
+})
 
 vim.cmd.colorscheme "catppuccin"
-vim.wo.number = true
+vim.opt.number = true
 vim.opt.mouse = "a"
 vim.opt.colorcolumn = "80"
 vim.opt.cursorline = true
 vim.opt.list = true
-vim.opt.listchars = "tab:→ ,trail:·,extends:>,precedes:<,space:·"
+vim.opt.listchars = "tab:→ ,trail:·,extends:»,precedes:«,space:·"
 vim.opt.completeopt = "menu,menuone,noinsert"
+vim.opt.relativenumber = false
+vim.opt.wrap = false
 
 vim.notify = require("notify")
 
@@ -119,6 +153,34 @@ local lsps = {
 	gopls = {},
 	rust_analyzer = {},
 	taplo = {},
+	dockerls = {},
+	lua_ls = {
+		on_init = function(client)
+			local path = client.workspace_folders[1].name
+
+			if not vim.loop.fs_stat(path .. "/.luarc.json") then
+				client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
+					Lua = {
+						runtime = {
+							version = "LuaJIT",
+						},
+						workspace = {
+							checkThirdParty = false,
+							library = {
+								vim.env.VIMRUNTIME,
+							},
+						},
+					},
+				})
+
+				client.notify("workspace/didChangeConfiguration", {
+					settings = client.config.settings,
+				})
+			end
+
+			return true
+		end,
+	},
 }
 
 require("mason").setup {}
@@ -130,34 +192,6 @@ require("mason-lspconfig").setup {
 for lsp, config in pairs(lsps) do
 	require("lspconfig")[lsp].setup(config)
 end
-
-require("lspconfig").lua_ls.setup({
-	on_init = function(client)
-		local path = client.workspace_folders[1].name
-
-		if not vim.loop.fs_stat(path .. "/.luarc.json") then
-			client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
-				Lua = {
-					runtime = {
-						version = "LuaJIT",
-					},
-					workspace = {
-						checkThirdParty = false,
-						library = {
-							vim.env.VIMRUNTIME,
-						},
-					},
-				},
-			})
-
-			client.notify("workspace/didChangeConfiguration", {
-				settings = client.config.settings,
-			})
-		end
-
-		return true
-	end,
-})
 
 vim.api.nvim_set_keymap("n", "<F2>", ":Stdheader<CR>", { noremap = true })
 
@@ -184,10 +218,28 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 	end,
 })
 
-vim.keymap.set("n", "<space>e", vim.diagnostic.open_float)
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
+vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist)
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
-vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
+
+local telescope_builtin = require("telescope.builtin")
+
+vim.keymap.set("n", "<leader>ff", telescope_builtin.find_files, {})
+vim.keymap.set("n", "<leader>fg", telescope_builtin.live_grep, {})
+vim.keymap.set("n", "<leader>fb", telescope_builtin.buffers, {})
+vim.keymap.set("n", "<leader>fh", telescope_builtin.help_tags, {})
+vim.keymap.set("n", "<leader>fe", telescope_builtin.diagnostics, {})
+vim.keymap.set("n", "<leader>fm", telescope_builtin.marks, {})
+
+-- local dapui = require("dapui")
+
+-- dapui.setup({})
+
+-- vim.keymap.set("n", "<leader>dt", dapui.toggle)
+-- vim.keymap.set("n", "<leader>db", ":DapToggleBreakpoint<CR>")
+-- vim.keymap.set("n", "<leader>dc", ":DapContinue<CR>")
+-- vim.keymap.set("n", "<leader>dr", ":DapUiToggle<CR>")
 
 -- https://github.com/neovim/nvim-lspconfig#suggested-configuration
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -204,24 +256,18 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
 		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 		vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
 
-		-- vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
-		-- vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
-		-- vim.keymap.set('n', '<space>wl', function()
-		-- 	print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-		-- end, opts)
-
-		vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, opts)
-		vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
-		vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
-		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-		vim.keymap.set("n", "<space>f", function()
-			vim.lsp.buf.format {
+		vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, opts)
+		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+		vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
+		vim.keymap.set("n", "<leader>F", function()
+			vim.lsp.buf.format({
 				async = true,
-			}
+			})
 		end, opts)
 		vim.keymap.set({ "n", "i" }, "<C-space>", vim.lsp.omnifunc, opts)
 	end,
