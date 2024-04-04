@@ -101,6 +101,10 @@ require("lazy").setup {
 		"folke/which-key.nvim",
 		opts = {},
 	},
+	{
+		'stevearc/dressing.nvim',
+		opts = {},
+	},
 }
 
 vim.cmd.colorscheme "catppuccin"
@@ -111,6 +115,7 @@ vim.opt.cursorline = true
 vim.opt.list = true
 vim.opt.listchars = "tab:→ ,trail:·,extends:>,precedes:<,space:·"
 vim.opt.completeopt = "menu,menuone,noinsert"
+vim.opt.wrap = false
 
 vim.notify = require("notify")
 
@@ -119,6 +124,8 @@ local lsps = {
 	gopls = {},
 	rust_analyzer = {},
 	taplo = {},
+	lua_ls = {},
+	docker_compose_language_service = {},
 }
 
 require("mason").setup {}
@@ -184,10 +191,19 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 	end,
 })
 
+local builtin = require("telescope.builtin")
+
+vim.keymap.set("n", "<space>ff", builtin.find_files, {})
+vim.keymap.set("n", "<space>fb", builtin.buffers, {})
+vim.keymap.set("n", "<space>fg", builtin.live_grep, {})
+vim.keymap.set("n", "<space>fm", builtin.marks, {})
+
 vim.keymap.set("n", "<space>e", vim.diagnostic.open_float)
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
+
+vim.keymap.set({ "n", "i" }, "<C-space>", vim.lsp.omnifunc)
 
 -- https://github.com/neovim/nvim-lspconfig#suggested-configuration
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -203,10 +219,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		}
 
 		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 		vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
+		vim.keymap.set("n", "gd", builtin.lsp_definitions, opts)
+		vim.keymap.set("n", "gi", builtin.lsp_implementations, opts)
+		vim.keymap.set("n", "gr", builtin.lsp_references, opts)
 
 		-- vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
 		-- vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
@@ -217,8 +234,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, opts)
 		vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
 		vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
-		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-		vim.keymap.set("n", "<space>f", function()
+		vim.keymap.set("n", "<space>F", function()
 			vim.lsp.buf.format {
 				async = true,
 			}
