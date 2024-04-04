@@ -1,4 +1,4 @@
-set -x XDG_CONFIG_HOME ~/.config
+# set -x XDG_CONFIG_HOME ~/.config
 
 functions -e fish_greeting
 
