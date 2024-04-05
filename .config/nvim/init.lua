@@ -255,9 +255,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 		vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
-		vim.keymap.set("n", "gd", builtin.lsp_definitions, opts)
-		vim.keymap.set("n", "gi", builtin.lsp_implementations, opts)
-		vim.keymap.set("n", "gr", builtin.lsp_references, opts)
+		vim.keymap.set("n", "gd", telescope_builtin.lsp_definitions, opts)
+		vim.keymap.set("n", "gi", telescope_builtin.lsp_implementations, opts)
+		vim.keymap.set("n", "gr", telescope_builtin.lsp_references, opts)
 
 		vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, opts)
 		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
